@@ -282,6 +282,9 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	len = ::GetPrivateProfileString(_T("CONFIG"), _T("ipaddr"), _T("192.168.4.11"), &buffer[0], buffer.size(), inifile);
 	server = std::wstring( buffer.begin(), buffer.begin() + len ).c_str();
 
+	len = ::GetPrivateProfileString(_T("CONFIG"), _T("tag"), _T("/Channel/MachineAxis/actToolBasePos[1]"), &buffer[0], buffer.size(), inifile);
+	tag = std::wstring( buffer.begin(), buffer.begin() + len ).c_str();
+
 	_nUser=0;
 	Load();
 
@@ -312,7 +315,7 @@ HRESULT CMainDlg::Connect(void)
 
 	CLSID gOpcServerClsid;
 	// OPC.SINUMERIK.MachineSwitch
-	sClsid=L"{75d00afe-dda5-11d1-b944-9e614d000000}";  // Siemens 840D OPC Server CLSID : 75d00afe-dda5-11d1-b944-9e614d000000
+	//sClsid=L"{75d00afe-dda5-11d1-b944-9e614d000000}";  // Siemens 840D OPC Server CLSID : 75d00afe-dda5-11d1-b944-9e614d000000
 	if(FAILED(CLSIDFromString(sClsid , &gOpcServerClsid)))
 	{
 		throw bstr_t(L"CLSIDFromString(_bstr_t(sClsid) , &gOpcServerClsid))) FAILED\n");
@@ -463,7 +466,7 @@ HRESULT CMainDlg::AddOPCItem(std::wstring name)
 	{
 		// fill item definition structure with data of our item (/bag/state/opmode)
 		opcItemDef[0].szAccessPath=L"";					// no access path description
-		opcItemDef[0].szItemID=WSTRClone(L"/Channel/MachineAxis/actToolBasePos[1]");			// ItemID of the variable (BTSS name)
+		opcItemDef[0].szItemID=WSTRClone(tag);			// ItemID of the variable (BTSS name)
 		opcItemDef[0].bActive=TRUE;						// set item active to get notifications, if value changes
 		opcItemDef[0].hClient=(OPCHANDLE)0x100;		    // client handle of the item
 		opcItemDef[0].dwBlobSize=0;						// no blob

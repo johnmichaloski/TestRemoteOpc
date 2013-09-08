@@ -41,6 +41,8 @@ public:
 	int _nUser;
 	_bstr_t sClsid;
 	_bstr_t server;
+	_bstr_t tag;
+
 	CString sUserSettings;
 	std::map<std::wstring, std::wstring> ParseIni(std::wstring inisection);
 		CString status;

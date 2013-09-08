@@ -20,6 +20,7 @@
 #define ID_REGISTRYBUTTON               1010
 #define IDC_AUTHENLEVELCOMBO4           1011
 #define IDC_IMPERSLEVELCOMBO5           1012
+#define ID_REGISTRYBUTTON2              1013
 #define IDC_USERSCOMBO3                 1014
 
 // Next default values for new objects
