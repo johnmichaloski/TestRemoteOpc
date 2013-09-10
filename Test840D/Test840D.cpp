@@ -44,7 +44,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 			-1, //Count of entries in asAuthSvc 
 			NULL, //Array of names to register 
 			NULL, //Reserved for future use 
-			RPC_C_AUTHN_LEVEL_NONE, //The default authentication //level for proxies 
+			RPC_C_AUTHN_LEVEL_CONNECT, // RPC_C_AUTHN_LEVEL_NONE The default authentication //level for proxies 
 			RPC_C_IMP_LEVEL_IDENTIFY, //The default impersonation //level for proxies 
 			NULL, //Reserved; must be set to  NULL
 			EOAC_NONE, //Additional client or //server-side capabilities 

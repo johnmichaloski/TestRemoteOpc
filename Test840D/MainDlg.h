@@ -47,8 +47,8 @@ public:
 	std::map<std::wstring, std::wstring> ParseIni(std::wstring inisection);
 		CString status;
 
-	IOPCServer * 	_pIOPCServer;
-	IOPCItemMgt *	_pIOPCItemMgt;
+	CComPtr<IOPCServer> 	_pIOPCServer;
+	CComPtr<IOPCItemMgt>	_pIOPCItemMgt;
 
 	BEGIN_MSG_MAP(CMainDlg)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
