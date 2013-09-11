@@ -43,6 +43,8 @@ public:
 	_bstr_t server;
 	_bstr_t tag;
 
+	_bstr_t domain, user, password;
+
 	CString sUserSettings;
 	std::map<std::wstring, std::wstring> ParseIni(std::wstring inisection);
 		CString status;

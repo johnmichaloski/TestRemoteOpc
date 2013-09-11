@@ -286,8 +286,16 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	tag = std::wstring( buffer.begin(), buffer.begin() + len ).c_str();
 
 	_nUser=0;
-	Load();
 
+
+	len = ::GetPrivateProfileString(_T("CONFIG"), _T("domain"), _T(""), &buffer[0], buffer.size(), inifile);
+	domain = std::wstring( buffer.begin(), buffer.begin() + len ).c_str();
+	len = ::GetPrivateProfileString(_T("CONFIG"), _T("user"), _T(""), &buffer[0], buffer.size(), inifile);
+	user = std::wstring( buffer.begin(), buffer.begin() + len ).c_str();
+	len = ::GetPrivateProfileString(_T("CONFIG"), _T("pw"), _T(""), &buffer[0], buffer.size(), inifile);
+	password = std::wstring( buffer.begin(), buffer.begin() + len ).c_str();
+
+	Load();
 
 
 	return TRUE;
@@ -303,7 +311,7 @@ HRESULT CMainDlg::Connect(void)
 	std::wstring buffer(1024, '0');;
 
 	try {
-		Load();
+		Save();
 
 		CoInitialize(NULL);
 
@@ -322,27 +330,31 @@ HRESULT CMainDlg::Connect(void)
 			throw bstr_t(L"CLSIDFromString(_bstr_t(sClsid) , &gOpcServerClsid))) FAILED\n");
 			return 0;
 		}
-		TCHAR * domain = L"NIST";
 
 		COAUTHIDENTITY idn; ((LPCWSTR) L".",(LPCWSTR) L"michalos",(LPCWSTR) "jlm%^%^cbm1984");
 		SecureZeroMemory(&idn, sizeof(COAUTHIDENTITY));
 		idn.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
-		idn.User = (USHORT*)L"michalos";
-		idn.UserLength = wcslen(L"michalos");
-		idn.Password = (USHORT*)L"jlm%^%^cbm1984";
-		idn.PasswordLength = wcslen(L"jlm%^%^cbm1984");
-		idn.Domain= (USHORT *)  L"NIST";
-		idn.DomainLength= wcslen( L"NIST");
+		idn.User = (USHORT*) (LPCWSTR) user;
+		idn.UserLength = wcslen(user);
+		idn.Password = (USHORT*)(LPCWSTR) password; //  L"jlm%^%^cbm1984";
+		idn.PasswordLength = wcslen(password);
+		idn.Domain= (USHORT *)  (LPCWSTR) domain;
+		idn.DomainLength= wcslen( domain);
 
 
 		COAUTHINFO AuthInfo;
+		SecureZeroMemory(&AuthInfo, sizeof(COAUTHINFO));
 		AuthInfo.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 		AuthInfo.dwAuthzSvc = RPC_C_AUTHZ_NONE;
-		AuthInfo.pwszServerPrincName = L"NIST\\mountaineer";
+		AuthInfo.pwszServerPrincName = domain + "\\" + server; // L"NIST\\mountaineer";
 		AuthInfo.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
 		AuthInfo.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
-		AuthInfo.pAuthIdentityData = &idn;
 		AuthInfo.dwCapabilities = EOAC_NONE;
+		if(user.length()>0)
+			AuthInfo.pAuthIdentityData = &idn;
+		else
+			AuthInfo.pAuthIdentityData =NULL;
+
 
 		COSERVERINFO srvinfo; // = {0, server, NULL, 0}; // Create the object and query for two interfaces
 		srvinfo.dwReserved1=0;
@@ -543,15 +555,20 @@ void CMainDlg::Save(void)
 	n_impersonationlevelEnum=_impersonationlevelCombo.GetCurSel();
 
 	// non-sequential enumerations
-	n_authnEnum=_enums.Value((LPCWSTR) _enums.authnitems[_authnCombo.GetCurSel()]);
+	//n_authnEnum=_enums.Value((LPCWSTR) _enums.authnitems[_authnCombo.GetCurSel()]);
 
 	// user 
-	_nUser=_usersCombo.GetCurSel();
+	//_nUser=_usersCombo.GetCurSel();
 
 
 	DWORD  ip;
 	_ipaddrControl.GetAddress(&ip);
 	server = bstrFormat(L"%d.%d.%d.%d", FIRST_IPADDRESS(ip),  SECOND_IPADDRESS(ip), THIRD_IPADDRESS(ip), FOURTH_IPADDRESS(ip));
+	domain=user=password=L"";
+	CString tmp;
+	GetDlgItem(IDC_EDIT1).GetWindowText( tmp); domain=tmp;
+	GetDlgItem(IDC_EDIT2).GetWindowText(tmp);user=tmp;
+	GetDlgItem(IDC_EDIT3).GetWindowText(tmp);password=tmp;
 }
 
 void CMainDlg::Load(void)
@@ -566,13 +583,15 @@ void CMainDlg::Load(void)
 	_authzCombo.SetCurSel(n_authzEnum);
 	_authnlevelCombo.SetCurSel(n_authnlevelEnum);
 	_impersonationlevelCombo.SetCurSel(n_impersonationlevelEnum);
-	_usersCombo.SetCurSel(_nUser);
+	//_usersCombo.SetCurSel(_nUser);
 	GetDlgItem(IDC_CLSIDTEXT).SetWindowText(sClsid);
-	GetDlgItem(IDC_USERINFO).SetWindowText(sUserSettings);
-	_ipaddrControl.SetAddress(htonl(inet_addr((LPCSTR) server)));
+	//GetDlgItem(IDC_USERINFO).SetWindowText(sUserSettings);
+	GetDlgItem(IDC_EDIT1).SetWindowText( domain);
+	GetDlgItem(IDC_EDIT1).SetWindowText( domain);
+	GetDlgItem(IDC_EDIT2).SetWindowText(user);
+	GetDlgItem(IDC_EDIT3).SetWindowText(password);
+	GetDlgItem(IDC_IPADDRESS).SetWindowText(server);
 
-	// non-sequential enumerations
-	_authnCombo.SetCurSel( _enums.Get(n_authnEnum, _enums.authnitems));
 
 }
 LRESULT CMainDlg::OnCbnEditAuthnCombo(WORD wNotifyCode, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled)
