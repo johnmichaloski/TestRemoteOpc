@@ -387,5 +387,6 @@ public:
 				return i; 
 		return 0; 
 	}
+
 };
 __declspec(selectany)  CDCOMEnums DCOMEnums;

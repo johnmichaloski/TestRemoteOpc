@@ -297,6 +297,12 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	Load();
 
+	 _opcServerCheck=  GetDlgItem(IDC_OPCSERVERCHECK);
+	 _opcGroupCheck=  GetDlgItem(IDC_OPCGROUPCHECK);
+	 _opcItemCheck=  GetDlgItem(IDC_OPCITEMSCHECK);
+	 _opcServerCheck.SetCheck( 0);
+	 _opcGroupCheck.SetCheck( 0);
+	 _opcItemCheck.SetCheck( 0);
 
 	return TRUE;
 }
@@ -308,6 +314,9 @@ HRESULT CMainDlg::Connect(void)
 {
 	HRESULT hr;
 	status = COleDateTime::GetCurrentTime().Format();
+	_opcServerCheck.SetCheck( 0);
+	_opcGroupCheck.SetCheck( 0);
+	_opcItemCheck.SetCheck( 0);
 	std::wstring buffer(1024, '0');;
 
 	try {
@@ -400,6 +409,8 @@ HRESULT CMainDlg::Connect(void)
 		//	throw  bstrFormat(L"COPCBackEnd::Connect Machine  -  GetStatus error 0x%x\n",hr );
 		//}
 		status+= L":Test840D Connect Succeded";
+		_opcServerCheck.SetCheck( BM_SETCHECK);
+
 		TestOPCGroup();
 		status+= L" Added OPC Group/Item";
 		
@@ -453,11 +464,13 @@ HRESULT CMainDlg::TestOPCGroup(void)
 		throw bstrFormat(L"FAIL: Connect() couldn't add group to server!\n");
 	}
 
+	_opcGroupCheck.SetCheck( BM_SETCHECK);
 	// add item to our group - MUST BE 840D ACCEPTABLE ITEM
 	if(FAILED(hResult = AddOPCItem(L"/Channel/MachineAxis/actToolBasePos[1]")))
 	{
 		throw bstrFormat(L"FAIL: Connect() couldn't add item to group!\n");
 	}
+	_opcItemCheck.SetCheck( BM_SETCHECK);
 
 	return S_OK;
 }
@@ -580,6 +593,7 @@ void CMainDlg::Load(void)
 	_impersonationSecurityCombo.SetCurSel(n_impLevelComSecurityEnum);
 
 	// CoCreateInstance
+	_authnCombo.SetCurSel(_enums.Get(RPC_C_AUTHN_WINNT,  _enums.authnitems) );
 	_authzCombo.SetCurSel(n_authzEnum);
 	_authnlevelCombo.SetCurSel(n_authnlevelEnum);
 	_impersonationlevelCombo.SetCurSel(n_impersonationlevelEnum);

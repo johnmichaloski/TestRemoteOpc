@@ -21,6 +21,11 @@ public:
 	CComboBox _authnlevelCombo;
 	CComboBox _impersonationlevelCombo;
 	CComboBox _usersCombo;
+
+	CButton _opcServerCheck;
+	CButton _opcGroupCheck;
+	CButton _opcItemCheck;
+
 	CDCOMEnums _enums;
 	CIPAddressCtrl _ipaddrControl;
 
